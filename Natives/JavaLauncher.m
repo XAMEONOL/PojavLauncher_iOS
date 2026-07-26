@@ -26,9 +26,6 @@ void init_loadDefaultEnv() {
     // Silent Caciocavallo NPE error in locating Android-only lib
     setenv("LD_LIBRARY_PATH", "", 1);
 
-    // Ignore mipmap for performance(?) seems does not affect iOS
-    //setenv("LIBGL_MIPMAP", "3", 1);
-
     // Disable overloaded functions hack for Minecraft 1.17+
     setenv("LIBGL_NOINTOVLHACK", "1", 1);
 
@@ -97,7 +94,6 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
         // Activate Library Validation bypass for external runtime and dylibs (JNA, etc)
         init_bypassDyldLibValidation();
     }
-
 
     init_loadDefaultEnv();
     init_loadCustomEnv();
@@ -185,7 +181,6 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     margv[++margc] = [NSString stringWithFormat:@"-DUIScreen.maximumFramesPerSecond=%d", (int)UIScreen.mainScreen.maximumFramesPerSecond].UTF8String;
     margv[++margc] = "-Dorg.lwjgl.glfw.checkThread0=false";
     margv[++margc] = "-Dorg.lwjgl.system.allocator=system";
-    //margv[++margc] = "-Dorg.lwjgl.util.NoChecks=true";
     margv[++margc] = "-Dlog4j2.formatMsgNoLookups=true";
 
     // Preset OpenGL libname
@@ -198,10 +193,13 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
         margv[++margc] = [NSString stringWithFormat:@"-Dorg.lwjgl.opengl.libname=%s", glLibName].UTF8String;
     }
 
+    // --- НАШ БЛОК ДЛЯ ELY.BY И АГЕНТОВ ---
     NSString *librariesPath = [NSString stringWithFormat:@"%@/libs", NSBundle.mainBundle.bundlePath];
     margv[++margc] = [NSString stringWithFormat:@"-javaagent:%@/patchjna_agent.jar=", librariesPath].UTF8String;
-    if(getPrefBool(@"general.cosmetica")) {
-        margv[++margc] = [NSString stringWithFormat:@"-javaagent:%@/arc_dns_injector.jar=23.95.137.176", librariesPath].UTF8String;
+    margv[++margc] = [NSString stringWithFormat:@"-javaagent:%@/authlib-injector.jar=https://authserver.ely.by/api/", librariesPath].UTF8String;
+    
+    if (getPrefBool(@"general.cosmetica")) {
+        margv[++margc] = [NSString stringWithFormat:@"-javaagent:%@/arc_dns_injector.jar=23.95.137.171", librariesPath].UTF8String;
     }
 
     // Workaround random stack guard allocation crashes
@@ -279,7 +277,6 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     if (!getEntitlementValue(@"com.apple.developer.kernel.extended-virtual-addressing")) {
         // In jailed environment, where extended virtual addressing entitlement isn't
         // present (for free dev account), allocating compressed space fails.
-        // FIXME: does extended VA allow allocating compressed class space?
         margv[++margc] = "-XX:-UseCompressedClassPointers";
     }
 
@@ -311,7 +308,6 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     } else {
         margv[++margc] = [launchTarget UTF8String];
     }
-    //margv[++margc] = "ghidra.GhidraRun";
 
     pJLI_Launch = (JLI_Launch_func *)dlsym(libjli, "JLI_Launch");
 
@@ -334,13 +330,11 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     tmpRootVC = nil;
 
     return pJLI_Launch(++margc, margv,
-                   0, NULL, // sizeof(const_jargs) / sizeof(char *), const_jargs,
-                   0, NULL, // sizeof(const_appclasspath) / sizeof(char *), const_appclasspath,
-                   // These values are ignored in Java 17, so keep it anyways
-                   "1.8.0-internal",
-                   "1.8",
-
-                   "java", "openjdk",
-                   /* (const_jargs != NULL) ? JNI_TRUE : */ JNI_FALSE,
-                   JNI_TRUE, JNI_FALSE, JNI_TRUE);
+                       0, NULL,
+                       0, NULL,
+                       "1.8.0-internal",
+                       "1.8",
+                       "java", "openjdk",
+                       JNI_FALSE,
+                       JNI_TRUE, JNI_FALSE, JNI_TRUE);
 }
