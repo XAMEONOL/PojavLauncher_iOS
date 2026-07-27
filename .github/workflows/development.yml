@@ -27,9 +27,9 @@ jobs:
       - name: Checkout repository submodules
         run: git submodule update --init --recursive
 
-      - name: Install Build Dependencies (gmake)
+      - name: Install Build Dependencies (gmake & cmake)
         run: |
-          brew install make
+          brew install make cmake
           sudo ln -s /opt/homebrew/bin/gmake /usr/local/bin/gmake || sudo ln -s /usr/bin/make /usr/local/bin/gmake || true
 
       - name: Set up JDK 8
@@ -54,21 +54,17 @@ jobs:
           
           gmake -j$(sysctl -n hw.ncpu) dsym package \
             PLATFORM=${{ matrix.platform }} \
-            JAVA_HOME="$JAVA_HOME" \
-            JDK8_DIR="$JAVA_HOME" \
-            JDK_DIR="$JAVA_HOME" \
-            JAVA_HOME_8="$JAVA_HOME"
+            BOOTJDK="$JAVA_HOME" \
+            JAVA_HOME="$JAVA_HOME"
 
           gmake -j$(sysctl -n hw.ncpu) dsym package \
             PLATFORM=${{ matrix.platform }} \
             TROLLSTORE_JIT_ENT=1 \
-            JAVA_HOME="$JAVA_HOME" \
-            JDK8_DIR="$JAVA_HOME" \
-            JDK_DIR="$JAVA_HOME" \
-            JAVA_HOME_8="$JAVA_HOME"
+            BOOTJDK="$JAVA_HOME" \
+            JAVA_HOME="$JAVA_HOME"
 
       - name: Upload regular ipa
-        uses: actions/upload-artifact@v4
+        uses: artifacts/upload-artifact@v4
         with:
           name: net.kdt.pojavlauncher-${{ matrix.platform_name }}.ipa
           path: artifacts/net.kdt.pojavlauncher-*-${{ matrix.platform_name }}.ipa
