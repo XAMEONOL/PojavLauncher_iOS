@@ -88,14 +88,10 @@ jobs:
       - name: Get JRE8
         uses: dawidd6/action-download-artifact@v2
         with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          workflow: build.yml
-          path: depends
-          workflow_conclusion: success
-          allow_forks: false
           repo: PojavLauncherTeam/android-openjdk-build-multiarch
-          branch: buildjre8
           name: jre8-ios-aarch64
+          workflow: build.yml
+          workflow_conclusion: success
 
       - name: Get JRE17
         uses: dawidd6/action-download-artifact@v2
