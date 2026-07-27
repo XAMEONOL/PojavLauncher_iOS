@@ -18,8 +18,7 @@ $(CLASSES): $(OUTPUTDIR)/%.class: $(SOURCEDIR)/%.java
 	@set -e
 	$(eval TARGET=$(word 2, $(subst /, ,$@)))
 	@mkdir -p $(OUTPUTDIR)/classes
-	@mkdir -p $(dir $@)
-	@echo "Compiling $<"
+	@$(BOOTJDK)/javac $(JCFLAGS) -d $(OUTPUTDIR)/classes $<	@echo "Compiling $<"
 	@$(BOOTJDK)/javac $(JCFLAGS) -d $(OUTPUTDIR)/classes $<
 	@cp $(@:$(OUTPUTDIR)/$(TARGET)/%.class=$(OUTPUTDIR)/classes/%*.class) $(dir $@)/
 
