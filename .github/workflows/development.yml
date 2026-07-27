@@ -64,7 +64,7 @@ jobs:
             JAVA_HOME="$JAVA_HOME"
 
       - name: Upload regular ipa
-        uses: artifacts/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: net.kdt.pojavlauncher-${{ matrix.platform_name }}.ipa
           path: artifacts/net.kdt.pojavlauncher-*-${{ matrix.platform_name }}.ipa
