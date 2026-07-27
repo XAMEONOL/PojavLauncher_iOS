@@ -27,9 +27,9 @@ jobs:
       - name: Checkout repository submodules
         run: git submodule update --init --recursive
 
-      - name: Install Build Dependencies (gmake, cmake, ldid)
+      - name: Install Build Dependencies
         run: |
-          brew install make cmake ldid
+          brew install make cmake ldid wget zip
           sudo ln -s /opt/homebrew/bin/gmake /usr/local/bin/gmake || sudo ln -s /usr/bin/make /usr/local/bin/gmake || true
 
       - name: Set up JDK 8
