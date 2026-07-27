@@ -63,13 +63,13 @@ jobs:
 
           gmake -j$(sysctl -n hw.ncpu) dsym package \
             PLATFORM=${{ matrix.platform }} \
-            BOOTJDK="$JAVA_HOME" \
+            BOOTJDK="$JAVA_HOME/bin" \
             JAVA_HOME="$JAVA_HOME"
 
           gmake -j$(sysctl -n hw.ncpu) dsym package \
             PLATFORM=${{ matrix.platform }} \
             TROLLSTORE_JIT_ENT=1 \
-            BOOTJDK="$JAVA_HOME" \
+            BOOTJDK="$JAVA_HOME/bin" \
             JAVA_HOME="$JAVA_HOME"
 
       - name: Upload regular ipa
